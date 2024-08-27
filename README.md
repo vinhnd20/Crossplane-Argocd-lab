@@ -28,9 +28,21 @@ viettelcloud_cmp_url=https://console.viettelcloud.vn/api
 viettelcloud_project_id=38909747-33b2-4d1c-94a8-19aa32e54cc9
 ```
 
-`` bash
-kubectl create secret generic viettelcloud-creds \
+``` bash
+  kubectl create secret generic viettelcloud-creds \
   -n argocd \
   --from-file=creds=./viettelcloud-creds.conf
 ```
+
+- Tạo crossplane provider Viettel: 
+
+``` bash
+  kubectl apply -n argocd -f argocd/crossplane-bootstrap/crossplane-provider-viettel.yaml
+  kubectl apply -n argocd -f argocd/crossplane-bootstrap/crossplane-provider-viettel-config.yaml
+  kubectl apply -n argocd -f argocd/crossplane-bootstrap.yaml 
+  kubectl apply -n argocd -f upbound/provider-viettel/crds/
+  
+```
+
+
 
