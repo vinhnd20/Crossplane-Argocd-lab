@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: crossplane-provider-viettel-infrastructure
+  name: infrastructure-bootstrap
   namespace: argocd
   labels:
     crossplane.jonashackt.io: crossplane
