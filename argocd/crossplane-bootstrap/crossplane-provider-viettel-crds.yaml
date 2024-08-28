@@ -1,25 +1,26 @@
-# The ArgoCD Application for all Crossplane Viettel providers incl. it's ProviderConfig
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: crossplane-provider-viettel-config
+  name: crossplane-provider-viettel-crds
   namespace: argocd
   labels:
     crossplane.jonashackt.io: crossplane
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
     repoURL: https://gitea.gitlabcloud.online/platform-toolings/crossplane-argocd
     targetRevision: HEAD
-    path: upbound/provider-viettel/config
+    path: upbound/provider-viettel/crds
   destination:
     namespace: default
     server: https://kubernetes.default.svc
+  # Using syncPolicy.automated here, otherwise the deployement of our Crossplane provider will fail with
+  # 'Resource not found in cluster: pkg.crossplane.io/v1/Provider:provider-aws-s3'
   # syncPolicy:
   #   automated:
   #     prune: true    

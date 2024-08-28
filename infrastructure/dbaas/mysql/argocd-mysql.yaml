@@ -1,7 +1,7 @@
 apiVersion: dbaas.viettel.vn/v1alpha1
 kind: Instance
 metadata:
-  name: maimaimottinhyeu
+  name: argocd-mysql
 spec:
   forProvider:
     databaseType: mysql

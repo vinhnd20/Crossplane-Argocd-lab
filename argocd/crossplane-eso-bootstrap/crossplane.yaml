@@ -14,7 +14,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/vinhnd20/Crossplane-Argocd-lab
+    repoURL: https://gitea.gitlabcloud.online/platform-toolings/crossplane-argocd
     targetRevision: HEAD
     path: crossplane
   destination:

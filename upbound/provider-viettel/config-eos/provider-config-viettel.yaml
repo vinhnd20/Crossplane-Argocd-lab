@@ -4,10 +4,10 @@ metadata:
   name: viettelcloud-creds
   namespace: crossplane-system
 type: Opaque
-data:
-  creds: |
+stringData:
+  credentials: |
     {
-      "viettelcloud_user_token": "{{ .secrets.viettelcloud_user_token }}",
-      "viettelcloud_cmp_url": "{{ .secrets.viettelcloud_cmp_url }}",
-      "viettelcloud_project_id": "{{ .secrets.viettelcloud_project_id }}"
+      "viettelcloud_user_token": "***",
+      "viettelcloud_cmp_url": "https://console.viettelcloud.vn/api",
+      "viettelcloud_project_id": "38909747-33b2-4d1c-94a8-19aa32e54cc9"
     }
