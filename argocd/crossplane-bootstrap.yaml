@@ -12,7 +12,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://gitea.gitlabcloud.online/platform-toolings/crossplane-argocd
+    repoURL: https://github.com/vinhnd20/Crossplane-Argocd-lab
     targetRevision: HEAD
     path: argocd/crossplane-bootstrap
   destination:
