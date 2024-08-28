@@ -1,27 +1,23 @@
-# The ArgoCD Application for all Crossplane Viettel providers
+# The ArgoCD Application for all Crossplane Managed Resources
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: crossplane-provider-viettel
+  name: dbaas-mysql
   namespace: argocd
   labels:
-    crossplane.jonashackt.io: crossplane
+    crossplane.jonashackt.io: infrastructure
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
   source:
     repoURL: https://github.com/vinhnd20/Crossplane-Argocd-lab
     targetRevision: HEAD
-    path: upbound/provider-viettel/provider
+    path: infrastructure/dbaas/mysql
   destination:
     namespace: default
     server: https://kubernetes.default.svc
-  # Using syncPolicy.automated here, otherwise the deployement of our Crossplane provider will fail with
-  # 'Resource not found in cluster: pkg.crossplane.io/v1/Provider:provider-viettel-s3'
   syncPolicy:
     automated:
       prune: true    
