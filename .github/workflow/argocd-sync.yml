@@ -1,0 +1,31 @@
+name: Sync ArgoCD Application
+
+on:
+  push:
+    branches:
+      - main  # Thay thế bằng nhánh bạn muốn theo dõi, ví dụ: main hoặc master
+
+jobs:
+  argocd-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install ArgoCD CLI
+      run: |
+        curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x /usr/local/bin/argocd
+
+    - name: Login to ArgoCD
+      env:
+        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}  # URL của ArgoCD server (ví dụ: argocd.example.com)
+        ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}  # Username của ArgoCD
+        ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}  # Password của ArgoCD
+      run: |
+        argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD --insecure
+
+    - name: Sync ArgoCD Application
+      run: |
+        argocd app sync infrastructure-bootstrap
