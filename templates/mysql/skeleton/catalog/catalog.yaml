@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  workspace: ${{ values.workspace }}
+  kusion_module: ${{ values.database_type }}
+  kusion_id: hashicorp:viettelcloud:viettelcloud_db_instance:${{ values.database_name }}
+  imported_id: ${{ values.database_name }}
+  name: ${{ values.database_name }}
+  database_region: ${{ values.database_region }}
+  database_type: ${{ values.database_type }}
+  database_host: ${{ values.database_name }}/host
+  database_username: ${{ values.database_name }}/username
+  database_password: ${{ values.database_name }}/password
+spec:
+  type: database
+  owner: ${{ values.owner }}
+  system: ${{ values.system }}

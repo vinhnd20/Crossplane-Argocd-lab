@@ -1,0 +1,17 @@
+apiVersion: dbaas.viettel.vn/v1alpha1
+kind: Instance
+metadata:
+  name: ${{ values.database_name }}
+spec:
+  forProvider:
+    databaseType: ${{ values.database_type }}
+    diskSize: ${{ values.database_disk_size }}
+    subnet: ${{ values.subnet }}
+    vpcName: ${{ values.vpc }}
+    enableAutoBackup: ${{ values.enable_auto_backup }}
+    solution: ${{ values.database_solution }}
+    rootPassword: ${{ values.root_password }}
+    volumeType: ${{ values.database_volume_type }}
+    flavor: ${{ values.database_flavor }}
+  providerConfigRef:
+    name: default

@@ -1,0 +1,213 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: viettelcloud-mysql
+  title: Viettel Cloud MySQL
+  description: A template for creating a new MySQL database of Viettel Cloud
+  tags:
+    - resource
+    - db
+    - mysql
+spec:
+  owner: user:hoangndst
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Provide MySQL database information
+      required:
+        - database_name
+        - database_type
+        - database_solution
+        - database_version
+        - database_flavor
+        - database_volume_type
+        - database_disk_size
+        - subnet
+        - database_region
+        - enable_auto_backup
+        - root_password
+      properties:
+        database_name:
+          title: Database Name
+          type: string
+          description: The name of the database to use
+          pattern: '^[a-zA-Z_][a-zA-Z0-9_-]*-mysql$'
+          ui:field: EntityNamePicker
+        database_type:
+          title: Database Type
+          type: string
+          description: The type of database to use
+          enum:
+            - mysql
+        database_solution:
+          title: Database Solution
+          type: string
+          description: The solution of the database to use
+          enum:
+            - basic
+            - business
+        database_version:
+          title: Database Version
+          type: string
+          description: The version of the database to use
+          enum:
+            - 5.7.29
+            - 5.7.30
+            - 8.0.20
+        database_flavor:
+          title: Database Instance Flavor
+          type: string
+          description: The flavor of database instance to use
+          enum:
+            - DBAAS_1vCPU_1_RAM
+            - DBAAS_2vCPU_2_RAM
+            - DBAAS_4vCPU_8_RAM
+            - DBAAS_8vCPU_16_RAM
+            - db.medium
+            - db.small
+            - db.xlarge
+        database_volume_type:
+          title: Database Volume Type
+          type: string
+          description: The volume type of database instance to use
+          enum:
+            - hdd
+            - hdd-encrypted
+            - ssd
+            - ssd-encrypted
+        database_disk_size:
+          title: Database Disk Size
+          type: number
+          description: The disk size of database instance to use
+          default: 10
+        subnet:
+          title: Subnet of database
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              - kind: Resource
+                spec.type: subnet
+        database_region:
+          title: Database Region
+          type: string
+          description: The region of the database to use
+          enum:
+            - vn-central-1
+          default: vn-central-1
+        enable_auto_backup:
+          title: Enable Database auto backup
+          type: boolean
+          default: false
+        root_password:
+          title: Root password
+          type: string
+          ui:field: Secret
+          default: DEMO_PASWord_2024
+    - title: System configuration
+      required:
+        - owner
+        - system
+        - workspace
+      properties:
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+        system:
+          title: System
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - System
+        workspace:
+          title: Workspace to create MySQL Database
+          type: string
+          description: The workspace of database instance to use
+          enum:
+            - dev
+            - staging
+            - production
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    - action: catalog:fetch
+      id: fetch-subnet
+      name: Fetch Subnet
+      input:
+        entityRef: ${{ parameters.subnet }}
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: template
+      name: Fetch Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          workspace: ${{ parameters.workspace }}
+          database_name: ${{ parameters.database_name }}
+          database_type: ${{ parameters.database_type }}
+          database_solution: ${{ parameters.database_solution }}
+          database_version: ${{ parameters.database_version }}
+          database_flavor: ${{ parameters.database_flavor }}
+          database_volume_type: ${{ parameters.database_volume_type }}
+          database_disk_size: ${{ parameters.database_disk_size }}
+          database_region: ${{ parameters.database_region }}
+          vpc: ${{ steps['fetch-subnet'].output.entity.metadata.vpc }}
+          subnet: ${{ steps['fetch-subnet'].output.entity.metadata.name }}
+          enable_auto_backup: ${{ parameters.enable_auto_backup }}
+          root_password: ${{ secrets.root_password }}
+    - action: fs:rename
+      id: rename-files
+      name: Rename Files
+      input:
+        files:
+          - from: resource/mysql.yaml
+            to: resource/${{ parameters.database_name }}.yaml
+          - from: catalog/catalog.yaml
+            to: catalog/${{ parameters.database_name }}-catalog.yaml
+
+    - id: push-resource
+      action: gitlab:repo:push
+      name: Push resource to gitlab
+      input:
+        repoUrl: gitlab.gitlabcloud.online?repo=crossplane-argocd&owner=platform-toolings
+        commitMessage: 'feat: provision ${{ parameters.database_type }} database ${{ parameters.database_name }}'
+        branchName: main
+        sourcePath: ./resource
+        targetPath: infrastructure/dbaas/${{ parameters.database_type }}
+
+    - id: push-catalog
+      action: gitlab:repo:push
+      name: Push catalog to gitlab
+      input:
+        repoUrl: gitlab.gitlabcloud.online?repo=backstage-catalog&owner=platform-toolings
+        commitMessage: 'feat: add ${{ parameters.database_type }} database ${{ parameters.database_name }}'
+        branchName: main
+        sourcePath: ./catalog
+        targetPath: resource/dbaas/${{ parameters.database_type }}
+    - action: catalog:register
+      id: register-with-catalog
+      name: Register with the catalog
+      input:
+        catalogInfoUrl: https://gitlab.gitlabcloud.online/platform-toolings/backstage-catalog/-/blob/main/resource/dbaas/${{ parameters.database_type }}/${{ parameters.database_name }}-catalog.yaml
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Gitlab Resource Commit link
+        url: 'https://gitlab.gitlabcloud.online/platform-toolings/crossplane-argocd/-/commit/${{ steps.push-resource.output.commitHash }}'
+      - title: Resource catalog
+        icon: catalog
+        entityRef: ${{ steps['register-with-catalog'].output.entityRef }}
