@@ -1,7 +1,7 @@
 apiVersion: dbaas.viettel.vn/v1alpha1
 kind: Instance
 metadata:
-  name: vinhvetde-mysql
+  name: hihihaha
 spec:
   forProvider:
     databaseType: mysql
