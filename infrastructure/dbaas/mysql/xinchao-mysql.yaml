@@ -1,16 +1,16 @@
 apiVersion: dbaas.viettel.vn/v1alpha1
 kind: Instance
 metadata:
-  name: 1234
+  name: xinchao-mysql1
 spec:
   forProvider:
     databaseType: mysql
     diskSize: 10
-    subnet: subnet
-    vpcName: vpc-new
+    subnet: subnet-chill
+    vpcName: vpc-chill
     enableAutoBackup: false
-    solution: "basic"
-    rootPassword: DEMO_PASWord_2024
+    solution: basic
+    rootPassword: root@cloudlab
     volumeType: hdd
     flavor: DBAAS_1vCPU_1_RAM
   providerConfigRef:
